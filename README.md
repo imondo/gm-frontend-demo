@@ -5,7 +5,7 @@
 
 由于公司业务需要国密加解密，查遍全网也只找到 [https://blog.csdn.net/taisuiyu6397/article/details/107086902/](https://blog.csdn.net/taisuiyu6397/article/details/107086902/) 这位博主自己写的算法；没办法，谁叫我算法差 😭
 
-## 使用
+## 注意
 
 不过在使用的时候还是碰到了一些问题
 
@@ -14,6 +14,34 @@
 - 解密时需要注意后端返回的数据是否有**换行符**（检查了好久😥）
 
 - [SM2 加解密](https://github.com/imondo/gm-crypto)前后端密钥生成不一致，所以采用 SM4 加密，SM3 对称比较方法
+
+## 加解密流程
+
+- 前端对传输参数 SM4 加密，且加密后字符串与当前时间戳 SM3 加密形成如下参数值传输
+
+```json
+{
+ id: SM4(id)
+
+ name: SM4(name)
+
+ date: new Date().getTime()
+}
+```
+
+或者
+
+```json
+{
+
+  id: id,
+  name: name,
+  date: new Date().getTime(),
+  encryptStr: SM3(id + name + date)
+}
+```
+
+- 后端接受参数依次像前端一样加密再与前端 `encryptStr` 对比是否一样
 
 ## 用法
 

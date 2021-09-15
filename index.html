@@ -9,6 +9,7 @@
   <script src="./crypto/base64.js"></script>
   <script src="./utils/hex.js"></script>
   <script src="./utils/byteUtil.js"></script>
+  <script src="./crypto/sm3.js"></script>
   <script src="./crypto/sm4.js"></script>
 </head>
 
@@ -65,6 +66,19 @@
         key: key
       })
       return JSON.parse(decryptedData.replace(/[\u0000]+./g, '')) // 由于算法补全，需要去掉 [\u0000]
+    }
+
+    // SM3 加密
+    function SM3Encode (value) {
+      // 这一步是先将输入数据转成utf-8编码的字节流，然后再转成16进制可见字符
+      const dataBy = Hex.utf8StrToBytes(value)
+
+      const sm3 = new SM3Digest()
+      sm3.update(dataBy, 0, dataBy.length) // 数据很多的话，可以分多次update
+      const sm3Hash = sm3.doFinal() // 得到的数据是个byte数组
+      const sm3HashHex = Hex.encode(sm3Hash, 0, sm3Hash.length) // 编码成16进制可见字符
+
+      return sm3HashHex.toLocaleLowerCase()
     }
   </script>
 </body>
