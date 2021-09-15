@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>国密</title>
+  <script src="./crypto/base64.js"></script>
+  <script src="./utils/hex.js"></script>
+  <script src="./utils/byteUtil.js"></script>
+  <script src="./crypto/sm4.js"></script>
+</head>
+
+<body>
+  <script>
+    const key = '1234567890123456' // 密钥需要前后端一致
+    const msg = {
+        pageResult: {
+          endRow: 10, firstPage: true, hasNextPage: true, hasPrePage: false, index: 0,
+          rows: [
+            {
+              account: "admin",
+              admin: true,
+              enable: true,
+              extend1: 0,
+              extend2: 0,
+              extend3: "2021-08-22 15:21:02",
+              from: "system",
+              fullname: "系统管理员",
+              groupId: "",
+              id: "1",
+              identityType: "user",
+              orgList: [],
+              preLoginTime: 1629614882000,
+              roleList: [],
+              status: 1,
+              userId: "1",
+            }
+          ],
+          total: 12
+        }
+      }
+    const encodeData = encode({
+      input: msg,
+      key
+    })
+    console.log(encodeData)
+    console.log(decode({ input: encodeData, key }))
+    // 加密
+    function encode({ input, key }) {
+      const _input = JSON.stringify(input) // 需要对加密数据序列化
+      let decryptedData = SM4.encode({
+        input: _input,
+        key: key
+      })
+      return decryptedData
+    }
+
+    // 解密
+    function decode({ input, key }) {
+      const _input = input.replace(/\r\n/g, "") // 去掉可能存在的换行符
+      let decryptedData = SM4.decode({
+        input: _input,
+        key: key
+      })
+      return JSON.parse(decryptedData.replace(/[\u0000]+./g, '')) // 由于算法补全，需要去掉 [\u0000]
+    }
+  </script>
+</body>
+
+</html>
